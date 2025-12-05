@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Open Booking System</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width:900px; margin:0 auto; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align:center; }
+    th { background:#f4f4f4; }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; align-items:center; }
+    .controls > * { padding:6px 8px; }
+    button { padding:8px 12px; cursor:pointer; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h2>Open Booking System</h2>
+
+  <div class="controls">
+    <label>Date: <input type="date" id="date"></label>
+
+    <label>Room:
+      <select id="room">
+        <option>101</option>
+        <option>102</option>
+        <option>103</option>
+        <option>104</option>
+      </select>
+    </label>
+
+    <label>Slot:
+      <select id="slot">
+        <option>08:00-08:30</option>
+        <option>08:30-09:00</option>
+        <option>09:00-09:30</option>
+        <option>09:30-10:00</option>
+        <option>10:00-10:30</option>
+        <option>10:30-11:00</option>
+        <!-- add more as needed -->
+      </select>
+    </label>
+
+    <label>Name: <input id="name" type="text" placeholder="Your name"></label>
+
+    <button id="bookBtn">Book Slot</button>
+  </div>
+
+  <div id="status" role="status"></div>
+
+  <h3>Booked Slots</h3>
+  <div id="tableDiv">Loading bookings…</div>
+
+<script>
+const api = "https://script.google.com/macros/s/AKfycbxzidQsMYaLgUudUz9jX-TpQDZJDrfizhK04N7YjDkgM7r5AsImsZQTTD8aLFlufkw-SA/exec"; // <<-- paste Apps Script URL here
+
+async function loadBookings() {
+  try {
+    const res = await fetch(api);
+    const bookings = await res.json();
+    renderTable(bookings || []);
+  } catch (err) {
+    document.getElementById('tableDiv').textContent = 'Failed to load bookings. See console.';
+    console.error(err);
+  }
+}
+
+function renderTable(bookings) {
+  if (!bookings.length) {
+    document.getElementById("tableDiv").innerHTML = "<p>No bookings yet.</p>";
+    return;
+  }
+  let html = `<table><thead><tr><th>Date</th><th>Room</th><th>Slot</th><th>Name</th></tr></thead><tbody>`;
+  bookings.forEach(b => {
+    html += `<tr><td>${escapeHtml(b.Date||b.date||'')}</td><td>${escapeHtml(b.Room||b.room||'')}</td><td>${escapeHtml(b.Slot||b.slot||'')}</td><td>${escapeHtml(b.Name||b.name||'')}</td></tr>`;
+  });
+  html += `</tbody></table>`;
+  document.getElementById("tableDiv").innerHTML = html;
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
+}
+
+document.getElementById('bookBtn').addEventListener('click', async () => {
+  const date = document.getElementById('date').value;
+  const room = document.getElementById('room').value;
+  const slot = document.getElementById('slot').value;
+  const name = document.getElementById('name').value.trim();
+
+  const status = document.getElementById('status');
+  status.textContent = '';
+  if (!date || !name) {
+    status.textContent = 'Please fill Date and Name.';
+    status.className = 'error';
+    return;
+  }
+
+  const payload = { date, room, slot, name };
+  try {
+    const res = await fetch(api, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      status.textContent = 'Booking successful!';
+      status.className = 'success';
+      document.getElementById('name').value = '';
+      loadBookings();
+    } else {
+      status.textContent = 'Booking failed: ' + (data.message||data.status||'unknown');
+      status.className = 'error';
+    }
+  } catch (err) {
+    console.error(err);
+    status.textContent = 'Booking failed — network error.';
+    status.className = 'error';
+  }
+});
+
+// initial load
+loadBookings();
+
+// optional: refresh bookings every 10s so public page updates
+setInterval(loadBookings, 10000);
+</script>
+
+</body>
+</html>
