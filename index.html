@@ -1,83 +1,99 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Booking System</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Booking System</title>
 
-  <style>
-    body {
-      background: #eef2f3;
-      font-family: Arial;
-      padding: 20px;
-    }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-      color: #2c3e50;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #aaa;
-    }
-    button {
-      margin-top: 15px;
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #2980b9;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th {
-      background: #3498db;
-      color: white;
-      padding: 10px;
-    }
-    td {
-      padding: 8px;
-      border: 1px solid #ddd;
-    }
-    .booked {
-      background: #ffdddd;
-      color: red;
-      font-weight: bold;
-    }
-    .available {
-      background: #ddffdd;
-      color: green;
-      font-weight: bold;
-    }
-    #status {
-      margin-top: 15px;
-      font-size: 16px;
-      font-weight: bold;
-    }
-  </style>
+<style>
+  body {
+    background:#eef2f3;
+    font-family:Arial;
+    margin:0;
+    padding:20px;
+  }
+
+  .container {
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.1);
+  }
+
+  h2 {
+    text-align:center;
+    color:#2c3e50;
+    margin-bottom:15px;
+  }
+
+  .field {
+    margin-top:12px;
+  }
+
+  label {
+    font-weight:bold;
+    display:block;
+    margin-bottom:4px;
+  }
+
+  input, select {
+    width:100%;
+    padding:10px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    font-size:16px;
+  }
+
+  button {
+    width:100%;
+    padding:12px;
+    margin-top:20px;
+    background:#3498db;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-size:18px;
+    cursor:pointer;
+  }
+  button:hover { background:#2980b9; }
+
+  #status {
+    margin-top:15px;
+    font-size:17px;
+    font-weight:bold;
+  }
+
+  table {
+    width:100%;
+    border-collapse:collapse;
+    margin-top:22px;
+  }
+
+  th {
+    background:#3498db;
+    color:white;
+    padding:10px;
+  }
+
+  td {
+    padding:10px;
+    border:1px solid #ddd;
+  }
+
+  .available {
+    background:#e8ffe8;
+    color:green;
+    font-weight:bold;
+  }
+
+  .booked {
+    background:#ffe2e2;
+    color:#d00000;
+    font-weight:bold;
+  }
+</style>
 </head>
 
 <body>
@@ -85,65 +101,74 @@
 
 <h2>Open Booking System</h2>
 
-<label>Date
+<div class="field">
+  <label>Select Date</label>
   <input type="date" id="date">
-</label>
+</div>
 
-<label>Room
+<div class="field">
+  <label>Select Room</label>
   <select id="room">
     <option>101</option>
     <option>102</option>
     <option>103</option>
   </select>
-</label>
+</div>
 
-<label>Slot
+<div class="field">
+  <label>Select Slot</label>
   <select id="slot">
     <option>10:00–11:00</option>
     <option>11:00–12:00</option>
     <option>12:00–13:00</option>
+    <option>13:00–14:00</option>
+    <option>14:00–15:00</option>
   </select>
-</label>
+</div>
 
-<label>Your Name
+<div class="field">
+  <label>Your Name</label>
   <input type="text" id="name">
-</label>
+</div>
 
 <button onclick="book()">Book Slot</button>
 
 <div id="status"></div>
 
-<h3>Booked Slots</h3>
+<h3>Bookings</h3>
 <div id="tableDiv">Loading...</div>
 
 </div>
 
 <script>
-const api = "https://script.google.com/macros/s/AKfycbxzidQsMYaLgUudUz9jX-TpQDZJDrfizhK04N7YjDkgM7r5AsImsZQTTD8aLFlufkw-SA/exec";  // <<--- UPDATE THIS
+const api = "https://script.google.com/macros/s/AKfycbxzidQsMYaLgUudUz9jX-TpQDZJDrfizhK04N7YjDkgM7r5AsImsZQTTD8aLFlufkw-SA/exec";  // <-- paste your /exec URL here
 
+let allBookings = [];
 const today = new Date().toISOString().split("T")[0];
 document.getElementById("date").min = today;
 
-let allBookings = [];
+// Reload booked slots when user changes date/room
+document.getElementById("date").addEventListener("change", updateSlotState);
+document.getElementById("room").addEventListener("change", updateSlotState);
 
-// LOAD BOOKINGS
+// Fetch all bookings
 async function loadBookings() {
   const res = await fetch(api);
   allBookings = await res.json();
+
   renderTable();
-  updateSlotAvailability();
+  updateSlotState();
 }
 
-// SHOW BOOKINGS TABLE
+// Show bookings table
 function renderTable() {
-  if (allBookings.length === 0) {
+  if (!allBookings.length) {
     document.getElementById("tableDiv").innerHTML = "No bookings yet.";
     return;
   }
 
-  let html = `<table><tr>
-      <th>Date</th><th>Room</th><th>Slot</th><th>Name</th>
-    </tr>`;
+  let html = `<table>
+    <tr><th>Date</th><th>Room</th><th>Slot</th><th>Name</th></tr>`;
 
   allBookings.forEach(b => {
     html += `<tr>
@@ -154,34 +179,34 @@ function renderTable() {
     </tr>`;
   });
 
-  html += "</table>";
+  html += `</table>`;
   document.getElementById("tableDiv").innerHTML = html;
 }
 
-// BLOCK ALREADY BOOKED SLOTS
-function updateSlotAvailability() {
-  const date = document.getElementById("date").value;
-  const room = document.getElementById("room").value;
+// Disable booked slots
+function updateSlotState() {
+  const d = document.getElementById("date").value;
+  const r = document.getElementById("room").value;
+  const slotSel = document.getElementById("slot");
 
-  const slotSelect = document.getElementById("slot");
-  const bookedSlots = new Set(
+  const booked = new Set(
     allBookings
-      .filter(b => b.Date === date && b.Room === room)
+      .filter(b => b.Date === d && b.Room === r)
       .map(b => b.Slot)
   );
 
-  for (let option of slotSelect.options) {
-    if (bookedSlots.has(option.value)) {
-      option.disabled = true;
-      option.textContent = option.value + " (Booked)";
+  for (let opt of slotSel.options) {
+    if (booked.has(opt.value)) {
+      opt.disabled = true;
+      opt.textContent = opt.value + " (Booked)";
     } else {
-      option.disabled = false;
-      option.textContent = option.value;
+      opt.disabled = false;
+      opt.textContent = opt.value;
     }
   }
 }
 
-// BOOK SLOT
+// Book a slot
 async function book() {
   const date = document.getElementById("date").value;
   const room = document.getElementById("room").value;
@@ -193,12 +218,12 @@ async function book() {
     return;
   }
 
-  const res = await fetch(api, {
+  const r = await fetch(api, {
     method: "POST",
     body: JSON.stringify({ date, room, slot, name })
   });
 
-  const result = await res.json();
+  const result = await r.json();
 
   if (result.status === "already_booked") {
     showStatus("This slot is already booked!", "red");
@@ -208,16 +233,12 @@ async function book() {
   }
 }
 
-// display message
+// Show message
 function showStatus(msg, color) {
   const s = document.getElementById("status");
   s.style.color = color;
   s.textContent = msg;
 }
-
-// reload slot availability when date/room changes
-document.getElementById("date").addEventListener("change", updateSlotAvailability);
-document.getElementById("room").addEventListener("change", updateSlotAvailability);
 
 loadBookings();
 </script>
