@@ -1,212 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Niraj's Meeting Room Scheduler</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 50;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meeting Room Scheduler</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body{font-family:'Inter',sans-serif;background:#f7f9fb;}
+</style>
 </head>
 <body class="p-4 sm:p-8">
-  <div id="app" class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl p-6 sm:p-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-6 text-center border-b pb-2">Meeting Room Scheduler</h1>
+<div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl p-6 sm:p-8">
 
-    <!-- Booking Form -->
-    <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-200 shadow-inner mb-10">
-      <h2 class="text-xl font-bold text-emerald-800 border-b pb-2 mb-4">New Booking</h2>
+<h1 class="text-3xl font-bold text-gray-900 mb-6 text-center border-b pb-2">Meeting Room Scheduler</h1>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div class="flex flex-col">
-          <label class="font-bold text-gray-700">Your Name*</label>
-          <input id="user-name" type="text" placeholder="Enter your name"
-                 class="p-3 border rounded-lg focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" required>
-        </div>
-        <div class="flex flex-col">
-          <label class="font-bold text-gray-700">Date*</label>
-          <input id="date-selector" type="date"
-                 class="p-3 border rounded-lg w-full bg-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
-        </div>
-      </div>
+<!-- Booking Form -->
+<div class="bg-emerald-50 p-6 rounded-xl border border-emerald-200 shadow-inner mb-10">
+  <h2 class="text-xl font-bold text-emerald-800 border-b pb-2 mb-4">New Booking</h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <div class="flex flex-col">
-          <label class="font-bold text-gray-700">Room*</label>
-          <select id="room-selector" class="p-3 border rounded-lg bg-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
-            <option value="A">Room A</option>
-            <option value="B">Room B</option>
-            <option value="C">Room C</option>
-            <option value="D">Room D</option>
-            <option value="A & B">Rooms A & B</option>
-          </select>
-        </div>
-        <div class="flex flex-col">
-          <label class="font-bold text-gray-700">Start Time*</label>
-          <select id="start-time" class="p-3 border rounded-lg bg-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"></select>
-        </div>
-        <div class="flex flex-col">
-          <label class="font-bold text-gray-700">End Time*</label>
-          <select id="end-time" class="p-3 border rounded-lg bg-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"></select>
-        </div>
-      </div>
-
-      <div id="status" class="text-center font-bold p-3 rounded-lg bg-gray-100 text-gray-800 mb-4"></div>
-
-      <button id="book-btn"
-              class="w-full px-6 py-3 bg-emerald-600 text-white font-bold rounded-full hover:bg-emerald-700 transition"
-              disabled>
-        Book Slot
-      </button>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <div class="flex flex-col">
+      <label class="font-bold text-gray-700">Your Name*</label>
+      <input id="user-name" type="text" placeholder="Enter your name" class="p-3 border rounded-lg focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
     </div>
-
-    <!-- Bookings Table -->
-    <div>
-      <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Active Bookings</h2>
-      <div id="bookings-container" class="bg-white shadow-lg rounded-xl overflow-x-auto border p-4 text-gray-600 text-center">
-        Loading bookings...
-      </div>
+    <div class="flex flex-col">
+      <label class="font-bold text-gray-700">Date*</label>
+      <input id="date-selector" type="date" class="p-3 border rounded-lg w-full bg-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
     </div>
   </div>
 
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyXbL0vzbQobyhkYaAo3lp3O6zXrw3ert45DCJAA5fHlvVjHRD92XHD7cOSaZeMkyjPpg/exec";
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    <div class="flex flex-col">
+      <label class="font-bold text-gray-700">Room*</label>
+      <select id="room-selector" class="p-3 border rounded-lg bg-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
+        <option value="A">Room A</option>
+        <option value="B">Room B</option>
+        <option value="C">Room C</option>
+        <option value="D">Room D</option>
+        <option value="A & B">Rooms A & B</option>
+      </select>
+    </div>
+    <div class="flex flex-col">
+      <label class="font-bold text-gray-700">Start Time*</label>
+      <select id="start-time" class="p-3 border rounded-lg bg-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"></select>
+    </div>
+    <div class="flex flex-col">
+      <label class="font-bold text-gray-700">End Time*</label>
+      <select id="end-time" class="p-3 border rounded-lg bg-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"></select>
+    </div>
+  </div>
 
-    const nameInput = document.getElementById('user-name');
-    const dateInput = document.getElementById('date-selector');
-    const roomSelect = document.getElementById('room-selector');
-    const startSelect = document.getElementById('start-time');
-    const endSelect = document.getElementById('end-time');
-    const statusDiv = document.getElementById('status');
-    const bookBtn = document.getElementById('book-btn');
-    const bookingsContainer = document.getElementById('bookings-container');
+  <div id="status" class="text-center font-bold p-3 rounded-lg bg-gray-100 text-gray-800 mb-4"></div>
+  <button id="book-btn" class="w-full px-6 py-3 bg-emerald-600 text-white font-bold rounded-full hover:bg-emerald-700 transition" disabled>Book Slot</button>
+</div>
 
-    // --- Initialize time slots 08:00 - 22:00 ---
-    const times = [];
-    for (let h=8; h<=22; h++) {
-      ['00','30'].forEach(m=>{
-        const time = `${String(h).padStart(2,'0')}:${m}`;
-        if (h===22 && m==='30') return;
-        times.push(time);
-      });
-    }
+<!-- Bookings Table -->
+<div>
+  <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Active Bookings</h2>
+  <div id="bookings-container" class="bg-white shadow-lg rounded-xl overflow-x-auto border p-4 text-gray-600 text-center">
+    Loading bookings...
+  </div>
+</div>
 
-    function populateTimeSelectors(){
-      startSelect.innerHTML = '<option value="">Select Start</option>' + times.map(t=>`<option value="${t}">${t}</option>`).join('');
-      endSelect.innerHTML = '<option value="">Select End</option>' + times.map(t=>`<option value="${t}">${t}</option>`).join('');
-    }
+</div>
 
-    populateTimeSelectors();
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzF6AT4rTPXwLo0aLHlUga-v8wq7w3TyFNoe2oCkGIqdKn6hYEWMGDDO3ZEO_fbb34AsA/exec";
 
-    // --- Date selector min today ---
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-    dateInput.min = todayStr;
-    dateInput.value = todayStr;
+const nameInput = document.getElementById('user-name');
+const dateInput = document.getElementById('date-selector');
+const roomSelect = document.getElementById('room-selector');
+const startSelect = document.getElementById('start-time');
+const endSelect = document.getElementById('end-time');
+const statusDiv = document.getElementById('status');
+const bookBtn = document.getElementById('book-btn');
+const bookingsContainer = document.getElementById('bookings-container');
 
-    // --- Validation & status ---
-    function updateStatus(){
-      const name = nameInput.value.trim();
-      const date = dateInput.value;
-      const room = roomSelect.value;
-      const start = startSelect.value;
-      const end = endSelect.value;
+const times = [];
+for(let h=8; h<=22; h++){['00','30'].forEach(m=>{if(h===22&&m==='30')return; times.push(`${String(h).padStart(2,'0')}:${m}`);});}
+startSelect.innerHTML='<option value="">Select Start</option>'+times.map(t=>`<option value="${t}">${t}</option>`).join('');
+endSelect.innerHTML='<option value="">Select End</option>'+times.map(t=>`<option value="${t}">${t}</option>`).join('');
 
-      if(!name){ statusDiv.textContent="Enter your name"; bookBtn.disabled=true; return; }
-      if(!date){ statusDiv.textContent="Select a date"; bookBtn.disabled=true; return; }
-      if(!room){ statusDiv.textContent="Select a room"; bookBtn.disabled=true; return; }
-      if(!start || !end){ statusDiv.textContent="Select start and end time"; bookBtn.disabled=true; return; }
+const today = new Date();
+dateInput.min = today.toISOString().split('T')[0];
+dateInput.value = dateInput.min;
 
-      if(timeToMin(start) >= timeToMin(end)){ statusDiv.textContent="End time must be after start"; bookBtn.disabled=true; return; }
+// --- Validation & status ---
+function timeToMin(str){ const [h,m]=str.split(':').map(Number); return h*60+m; }
+function updateStatus(){
+  const name = nameInput.value.trim();
+  const date = dateInput.value;
+  const room = roomSelect.value;
+  const start = startSelect.value;
+  const end = endSelect.value;
 
-      statusDiv.textContent = `Ready to book ${room} from ${start} to ${end} on ${date}`;
-      bookBtn.disabled = false;
-    }
+  if(!name){ statusDiv.textContent="Enter your name"; bookBtn.disabled=true; return; }
+  if(!date){ statusDiv.textContent="Select a date"; bookBtn.disabled=true; return; }
+  if(!room){ statusDiv.textContent="Select a room"; bookBtn.disabled=true; return; }
+  if(!start || !end){ statusDiv.textContent="Select start and end time"; bookBtn.disabled=true; return; }
+  if(timeToMin(start)>=timeToMin(end)){ statusDiv.textContent="End must be after start"; bookBtn.disabled=true; return; }
 
-    function timeToMin(str){ const [h,m]=str.split(':').map(Number); return h*60+m; }
+  statusDiv.textContent=`Ready to book ${room} from ${start} to ${end} on ${date}`;
+  bookBtn.disabled=false;
+}
 
-    nameInput.addEventListener('input', updateStatus);
-    dateInput.addEventListener('change', updateStatus);
-    roomSelect.addEventListener('change', updateStatus);
-    startSelect.addEventListener('change', updateStatus);
-    endSelect.addEventListener('change', updateStatus);
+nameInput.addEventListener('input', updateStatus);
+dateInput.addEventListener('change', updateStatus);
+roomSelect.addEventListener('change', updateStatus);
+startSelect.addEventListener('change', updateStatus);
+endSelect.addEventListener('change', updateStatus);
+updateStatus();
 
-    updateStatus();
+// --- Load bookings ---
+async function loadBookings(){
+  try{
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    if(!Array.isArray(data)) throw new Error("Invalid data");
 
-    // --- Load bookings ---
-    async function loadBookings(){
-      try{
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        if(!Array.isArray(data)) throw new Error("Invalid data");
+    if(data.length===0){ bookingsContainer.innerHTML='No bookings yet'; return; }
 
-        if(data.length===0){ bookingsContainer.innerHTML = 'No bookings yet'; return; }
+    // Highlight booked slots
+    const bookedSlots = data.filter(b=>b.date===dateInput.value).map(b=>b.start+'-'+b.end+'-'+b.room);
 
-        let html = `<table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50"><tr>
-          <th class="px-6 py-3 text-left">Date</th>
-          <th class="px-6 py-3 text-left">Time</th>
-          <th class="px-6 py-3 text-left">Room</th>
-          <th class="px-6 py-3 text-left">Booked By</th>
-        </tr></thead><tbody class="bg-white divide-y divide-gray-200">`;
+    let html='<table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3">Date</th><th class="px-6 py-3">Time</th><th class="px-6 py-3">Room</th><th class="px-6 py-3">Booked By</th></tr></thead><tbody class="bg-white divide-y divide-gray-200">';
+    data.sort((a,b)=> (a.date+a.start).localeCompare(b.date+b.start));
+    data.forEach(b=>{html+=`<tr><td class="px-6 py-2">${b.date}</td><td class="px-6 py-2">${b.start} - ${b.end}</td><td class="px-6 py-2">${b.room}</td><td class="px-6 py-2">${b.name}</td></tr>`;});
+    html+='</tbody></table>';
+    bookingsContainer.innerHTML=html;
 
-        data.sort((a,b)=> (a.date+a.start).localeCompare(b.date+b.start));
-
-        data.forEach(b=>{
-          html += `<tr>
-            <td class="px-6 py-2">${b.date}</td>
-            <td class="px-6 py-2">${b.start} - ${b.end}</td>
-            <td class="px-6 py-2">${b.room}</td>
-            <td class="px-6 py-2">${b.name}</td>
-          </tr>`;
-        });
-
-        html += `</tbody></table>`;
-        bookingsContainer.innerHTML = html;
-
-      }catch(err){
-        bookingsContainer.innerHTML = `<p class="text-red-500 font-semibold">${err.message}</p>`;
-      }
-    }
-
-    loadBookings();
-
-    // --- Book slot ---
-    bookBtn.addEventListener('click', async ()=>{
-      const payload = {
-        name: nameInput.value.trim(),
-        date: dateInput.value,
-        room: roomSelect.value,
-        start: startSelect.value,
-        end: endSelect.value
-      };
-      bookBtn.disabled = true;
-      statusDiv.textContent="Processing booking...";
-
-      try{
-        const res = await fetch(API_URL, {
-          method:'POST',
-          body: JSON.stringify(payload)
-        });
-        const result = await res.json();
-
-        if(result.status==='success'){
-          statusDiv.textContent="Booking successful!";
-          loadBookings();
-        }else{
-          statusDiv.textContent = result.message || "Booking failed";
-        }
-      }catch(err){
-        statusDiv.textContent="Error: "+err.message;
-      }finally{
-        bookBtn.disabled=false;
+    // Disable already booked slots
+    times.forEach(t=>{
+      const startOpt = startSelect.querySelector(`option[value="${t}"]`);
+      const endOpt = endSelect.querySelector(`option[value="${t}"]`);
+      if(startOpt) startOpt.disabled=false;
+      if(endOpt) endOpt.disabled=false;
+    });
+    data.forEach(b=>{
+      if(b.date===dateInput.value){
+        const startOpt = startSelect.querySelector(`option[value="${b.start}"]`);
+        const endOpt = endSelect.querySelector(`option[value="${b.end}"]`);
+        if(startOpt) startOpt.disabled=true;
+        if(endOpt) endOpt.disabled=true;
       }
     });
-  </script>
+
+  }catch(err){ bookingsContainer.innerHTML=`<p class="text-red-500 font-semibold">${err.message}</p>`; }
+}
+
+loadBookings();
+
+// --- Book slot ---
+bookBtn.addEventListener('click', async ()=>{
+  const payload = { name:nameInput.value.trim(), date:dateInput.value, room:roomSelect.value, start:startSelect.value, end:endSelect.value };
+  bookBtn.disabled=true; statusDiv.textContent="Processing...";
+  try{
+    const res=await fetch(API_URL,{method:'POST',body:JSON.stringify(payload)});
+    const result=await res.json();
+    if(result.status==='success'){statusDiv.textContent="Booking successful!"; loadBookings();}
+    else statusDiv.textContent=result.message||"Booking failed";
+  }catch(err){ statusDiv.textContent="Error: "+err.message; }
+  finally{ bookBtn.disabled=false; }
+});
+
+dateInput.addEventListener('change', loadBookings);
+</script>
 </body>
 </html>
