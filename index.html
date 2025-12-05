@@ -19,7 +19,9 @@
     h1{color:var(--accent);margin:0 0 14px;font-size:22px;text-align:center}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     label{display:block;font-weight:600;color:#0f172a;margin-bottom:6px}
-    input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;background:#fbfeff;font-size:15px}
+    input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;background:#fbfeff;font-size:15px;box-sizing:border-box}
+    /* ensure selects render consistently and are visible */
+    select { appearance: menulist-button; -webkit-appearance: menulist-button; -moz-appearance: menulist-button; }
     input:focus,select:focus{outline:none;box-shadow:0 0 0 4px rgba(11,116,222,0.08);border-color:var(--accent)}
     .full{grid-column:1/ -1}
     button{width:100%;padding:12px;border-radius:10px;background:var(--accent);color:#fff;border:0;font-weight:700;cursor:pointer}
@@ -49,8 +51,9 @@
 
       <div>
         <label for="room">Room</label>
-        <select id="room">
-          <option value="A">Room A</option>
+        <!-- Added a default placeholder option so the select is visible and non-empty -->
+        <select id="room" aria-label="Room select">
+          <option value="A" selected>Room A</option>
           <option value="B">Room B</option>
           <option value="C">Room C</option>
           <option value="D">Room D</option>
@@ -60,17 +63,17 @@
 
       <div>
         <label for="start">Start Time</label>
-        <select id="start"></select>
+        <select id="start" aria-label="Start time"></select>
       </div>
 
       <div>
         <label for="end">End Time</label>
-        <select id="end"></select>
+        <select id="end" aria-label="End time"></select>
       </div>
 
       <div class="full">
         <label for="name">Your name</label>
-        <input id="name" type="text" placeholder="Enter your name (required)" />
+        <input id="name" type="text" placeholder="Enter your name" />
       </div>
 
       <div class="full">
@@ -88,8 +91,10 @@
   </div>
 
 <script>
+/* ---------- CONFIG ---------- */
 const API = "https://script.google.com/macros/s/AKfycbxzidQsMYaLgUudUz9jX-TpQDZJDrfizhK04N7YjDkgM7r5AsImsZQTTD8aLFlufkw-SA/exec";
 
+/* ---------- ELEMENTS ---------- */
 const startSel = document.getElementById('start');
 const endSel = document.getElementById('end');
 const dateInput = document.getElementById('date');
@@ -102,14 +107,15 @@ const bookingsTable = document.getElementById('bookingsTable');
 const bookBody = document.getElementById('bookBody');
 
 let bookings = []; // fetched bookings
+
+/* ---------- INIT ---------- */
 const todayISO = new Date().toISOString().split('T')[0];
 dateInput.min = todayISO;
 
-// generate time options 08:00 -> 22:00 with 30-min step
 function generateTimes() {
   const times = [];
-  const start = 8*60; // 08:00
-  const end = 22*60; // 22:00
+  const start = 8*60; // 8:00
+  const end = 22*60;  // 22:00
   for (let t = start; t <= end; t += 30) {
     const hh = String(Math.floor(t/60)).padStart(2,'0');
     const mm = String(t%60).padStart(2,'0');
@@ -117,17 +123,17 @@ function generateTimes() {
   }
   return times;
 }
-
 const timesArr = generateTimes();
+
 function populateTimeSelects(){
   startSel.innerHTML = '';
   endSel.innerHTML = '';
-  // start options: all except last (so end can be after)
+  // start: all except last
   for (let i=0;i<timesArr.length-1;i++){
     const opt = document.createElement('option'); opt.value = timesArr[i]; opt.textContent = timesArr[i];
     startSel.appendChild(opt);
   }
-  // end options initially all after first start
+  // end: all after first
   for (let i=1;i<timesArr.length;i++){
     const opt = document.createElement('option'); opt.value = timesArr[i]; opt.textContent = timesArr[i];
     endSel.appendChild(opt);
@@ -135,9 +141,8 @@ function populateTimeSelects(){
 }
 populateTimeSelects();
 
-startSel.addEventListener('change', () => {
+startSel.addEventListener('change', ()=> {
   const s = startSel.value;
-  // rebuild end options that are strictly greater than start
   endSel.innerHTML = '';
   for (let t of timesArr) {
     if (timeToMin(t) > timeToMin(s)) {
@@ -147,12 +152,12 @@ startSel.addEventListener('change', () => {
   }
 });
 
-// utility: "HH:MM" -> minutes
-function timeToMin(t){
-  const [h,m] = t.split(':').map(Number); return h*60 + m;
-}
+/* ---------- UTIL ---------- */
+function timeToMin(t){ const [h,m] = t.split(':').map(Number); return h*60 + m; }
+function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+function roomsFromValue(roomVal){ if (!roomVal) return []; if (roomVal==='A+B' || roomVal==='A + B' || roomVal==='A & B') return ['A','B']; return [roomVal]; }
 
-// Fetch bookings from backend
+/* ---------- FETCH / RENDER ---------- */
 async function fetchBookings(){
   try {
     const res = await fetch(API);
@@ -167,11 +172,9 @@ async function fetchBookings(){
   }
 }
 
-// Render table
 function renderBookings(){
   bookBody.innerHTML = '';
-  // sort by date then start
-  bookings.sort((a,b) => {
+  bookings.sort((a,b)=>{
     if (a.date < b.date) return -1;
     if (a.date > b.date) return 1;
     if (a.start < b.start) return -1;
@@ -181,103 +184,82 @@ function renderBookings(){
   for (const r of bookings){
     const tr = document.createElement('tr');
     const roomLabel = getRoomTag(r.room);
-    tr.innerHTML = `<td>${r.date}</td>
-      <td>${r.start} → ${r.end}</td>
+    tr.innerHTML = `<td>${escapeHtml(r.date)}</td>
+      <td>${escapeHtml(r.start)} → ${escapeHtml(r.end)}</td>
       <td>${roomLabel}</td>
       <td>${escapeHtml(r.name)}</td>`;
     bookBody.appendChild(tr);
   }
 }
-
-// room label with color tag
 function getRoomTag(roomVal){
   if (!roomVal) return '';
-  if (roomVal === 'A+B') return `<span class="tag A-B">A & B</span>`;
-  const cls = roomVal.replace(/\s+/g,''); // e.g. "A"
+  if (roomVal==='A+B') return `<span class="tag A-B">A & B</span>`;
+  const cls = roomVal.replace(/\s+/g,'');
   return `<span class="tag ${cls}">${roomVal}</span>`;
 }
 
-// escape HTML
-function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
-
-// Determine if requested booking conflicts with existing bookings
-// body: {date, start, end, room}
-function clientConflictCheck(body){
-  const roomsToBook = roomsFromValue(body.room); // e.g. ['A','B']
-  const s = timeToMin(body.start);
-  const e = timeToMin(body.end);
-
+/* ---------- CLIENT CONFLICT CHECK ---------- */
+function clientConflictCheck({date,start,end,room}){
+  const roomsToBook = roomsFromValue(room);
+  const s = timeToMin(start), e = timeToMin(end);
   for (const b of bookings){
-    if (String(b.date) !== String(body.date)) continue;
+    if (String(b.date) !== String(date)) continue;
     const existingRooms = roomsFromValue(b.room);
-    // if no common rooms, skip
     const intersect = existingRooms.filter(x=>roomsToBook.includes(x));
     if (intersect.length === 0) continue;
-    const rs = timeToMin(b.start);
-    const re = timeToMin(b.end);
+    const rs = timeToMin(b.start), re = timeToMin(b.end);
     if (s < re && rs < e) {
-      return { conflict: true, rooms: intersect, existing: b };
+      return { conflict:true, rooms:intersect, existing:b };
     }
   }
-  return { conflict: false };
+  return { conflict:false };
 }
 
-function roomsFromValue(roomVal){
-  if (!roomVal) return [];
-  if (roomVal === 'A+B' || roomVal === 'A + B' || roomVal === 'A & B') return ['A','B'];
-  return [roomVal];
-}
-
-// On submit
-bookBtn.addEventListener('click', async () => {
+/* ---------- BOOKING HANDLER ---------- */
+bookBtn.addEventListener('click', async ()=>{
   clearStatus();
   const date = dateInput.value;
   const start = startSel.value;
   const end = endSel.value;
   const room = roomSel.value;
   const name = nameInput.value.trim();
-
-  if (!date || !start || !end || !name || !room) {
+  if (!date || !start || !end || !room || !name) {
     showError('Please fill all fields.');
     return;
   }
-  // client-side check: start < end already enforced by selects
-  // check conflict
+
   const check = clientConflictCheck({date,start,end,room});
   if (check.conflict) {
-    showError(`Conflict: overlaps existing booking for room(s): ${check.rooms.join(', ')} (${check.existing.start}–${check.existing.end})`);
+    showError(`Conflict with existing booking for room(s): ${check.rooms.join(', ')} (${check.existing.start}-${check.existing.end})`);
     return;
   }
 
-  // send to server
   try {
     const resp = await fetch(API, {
-      method: 'POST',
+      method:'POST',
       body: JSON.stringify({ date, name, start, end, room })
     });
     const data = await resp.json();
     if (data.status === 'success') {
       showSuccess('Booked successfully!');
-      // refresh bookings
       await fetchBookings();
     } else if (data.status === 'conflict') {
-      showError('Server conflict: ' + (data.message || 'Overlapping booking'));
-      // refresh to show true state
+      showError('Server conflict: ' + (data.message || 'Overlap'));
       await fetchBookings();
     } else {
-      showError('Error: ' + (data.message || 'Unknown error'));
+      showError('Error: ' + (data.message || 'Unknown'));
     }
   } catch (err) {
     console.error(err);
-    showError('Network or server error. Check console.');
+    showError('Network or server error.');
   }
 });
 
-function showSuccess(msg){ statusDiv.className='status success'; statusDiv.textContent = msg; setTimeout(()=>{ statusDiv.textContent=''; }, 4000); }
-function showError(msg){ statusDiv.className='status error'; statusDiv.textContent = msg; setTimeout(()=>{ statusDiv.textContent=''; }, 6000); }
+function showSuccess(msg){ statusDiv.className='status success'; statusDiv.textContent=msg; setTimeout(()=>{ statusDiv.textContent=''; },4000); }
+function showError(msg){ statusDiv.className='status error'; statusDiv.textContent=msg; setTimeout(()=>{ statusDiv.textContent=''; },6000); }
 function clearStatus(){ statusDiv.textContent=''; statusDiv.className='status small'; }
 
-// initial load
+/* ---------- START ---------- */
 fetchBookings();
 </script>
 </body>
