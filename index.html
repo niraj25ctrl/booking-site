@@ -3,131 +3,197 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Open Booking System</title>
+  <title>Booking System</title>
+
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width:900px; margin:0 auto; }
-    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align:center; }
-    th { background:#f4f4f4; }
-    .controls { display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; align-items:center; }
-    .controls > * { padding:6px 8px; }
-    button { padding:8px 12px; cursor:pointer; }
-    .success { color: green; }
-    .error { color: red; }
+    body {
+      background: #f5f7fa;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .controls label {
+      background: #ecf0f1;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    input, select {
+      padding: 6px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #bdc3c7;
+    }
+
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th {
+      background: #3498db;
+      color: white;
+      padding: 10px;
+    }
+
+    td {
+      padding: 8px;
+      border: 1px solid #dcdcdc;
+    }
+
+    .success { color: green; font-weight: bold; }
+    .error { color: red; font-weight: bold; }
   </style>
 </head>
+
 <body>
-  <h2>Open Booking System</h2>
+<div class="container">
 
-  <div class="controls">
-    <label>Date: <input type="date" id="date"></label>
+<h2>Open Booking System</h2>
 
-    <label>Room:
-      <select id="room">
-        <option>101</option>
-        <option>102</option>
-        <option>103</option>
-        <option>104</option>
-      </select>
-    </label>
+<div class="controls">
 
-    <label>Slot:
-      <select id="slot">
-        <option>08:00-08:30</option>
-        <option>08:30-09:00</option>
-        <option>09:00-09:30</option>
-        <option>09:30-10:00</option>
-        <option>10:00-10:30</option>
-        <option>10:30-11:00</option>
-        <!-- add more as needed -->
-      </select>
-    </label>
+  <label>Date:
+    <input type="date" id="date">
+  </label>
 
-    <label>Name: <input id="name" type="text" placeholder="Your name"></label>
+  <label>Room:
+    <select id="room">
+      <option>101</option>
+      <option>102</option>
+      <option>103</option>
+    </select>
+  </label>
 
-    <button id="bookBtn">Book Slot</button>
-  </div>
+  <label>Slot:
+    <select id="slot">
+      <option>10:00–11:00</option>
+      <option>11:00–12:00</option>
+      <option>12:00–13:00</option>
+    </select>
+  </label>
 
-  <div id="status" role="status"></div>
+  <label>Name:
+    <input type="text" id="name" placeholder="Your name">
+  </label>
 
-  <h3>Booked Slots</h3>
-  <div id="tableDiv">Loading bookings…</div>
+  <button onclick="book()">Book Slot</button>
+</div>
+
+<div id="status"></div>
+
+<h3>Booked Slots</h3>
+<div id="tableDiv">Loading bookings...</div>
+
+</div>
 
 <script>
-const api = "https://script.google.com/macros/s/AKfycbxzidQsMYaLgUudUz9jX-TpQDZJDrfizhK04N7YjDkgM7r5AsImsZQTTD8aLFlufkw-SA/exec"; // <<-- paste Apps Script URL here
+const api = "YOUR_WEB_APP_URL_HERE"; // <-- paste your Apps Script Web App URL here
 
+// Prevent selecting past dates
+const today = new Date().toISOString().split("T")[0];
+document.getElementById("date").setAttribute("min", today);
+
+// Load bookings
 async function loadBookings() {
-  try {
-    const res = await fetch(api);
-    const bookings = await res.json();
-    renderTable(bookings || []);
-  } catch (err) {
-    document.getElementById('tableDiv').textContent = 'Failed to load bookings. See console.';
-    console.error(err);
-  }
+  const res = await fetch(api);
+  let bookings = await res.json();
+
+  // Auto-delete past dates visually (backend handles deletion too)
+  bookings = bookings.filter(b => new Date(b.Date) >= new Date(today));
+
+  renderTable(bookings);
 }
 
+// Render table
 function renderTable(bookings) {
   if (!bookings.length) {
     document.getElementById("tableDiv").innerHTML = "<p>No bookings yet.</p>";
     return;
   }
-  let html = `<table><thead><tr><th>Date</th><th>Room</th><th>Slot</th><th>Name</th></tr></thead><tbody>`;
+
+  let html = `<table><tr>
+      <th>Date</th><th>Room</th><th>Slot</th><th>Name</th>
+    </tr>`;
+
   bookings.forEach(b => {
-    html += `<tr><td>${escapeHtml(b.Date||b.date||'')}</td><td>${escapeHtml(b.Room||b.room||'')}</td><td>${escapeHtml(b.Slot||b.slot||'')}</td><td>${escapeHtml(b.Name||b.name||'')}</td></tr>`;
+    html += `<tr>
+      <td>${b.Date}</td>
+      <td>${b.Room}</td>
+      <td>${b.Slot}</td>
+      <td>${b.Name}</td>
+    </tr>`;
   });
-  html += `</tbody></table>`;
+
+  html += "</table>";
   document.getElementById("tableDiv").innerHTML = html;
 }
 
-function escapeHtml(s) {
-  if (!s) return '';
-  return s.toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
-}
+// Book slot
+async function book() {
+  const date = document.getElementById("date").value;
+  const room = document.getElementById("room").value;
+  const slot = document.getElementById("slot").value;
+  const name = document.getElementById("name").value.trim();
+  const status = document.getElementById("status");
 
-document.getElementById('bookBtn').addEventListener('click', async () => {
-  const date = document.getElementById('date').value;
-  const room = document.getElementById('room').value;
-  const slot = document.getElementById('slot').value;
-  const name = document.getElementById('name').value.trim();
-
-  const status = document.getElementById('status');
-  status.textContent = '';
   if (!date || !name) {
-    status.textContent = 'Please fill Date and Name.';
-    status.className = 'error';
+    status.innerHTML = "Please fill all fields.";
+    status.className = "error";
     return;
   }
 
-  const payload = { date, room, slot, name };
-  try {
-    const res = await fetch(api, {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (data.status === 'success') {
-      status.textContent = 'Booking successful!';
-      status.className = 'success';
-      document.getElementById('name').value = '';
-      loadBookings();
-    } else {
-      status.textContent = 'Booking failed: ' + (data.message||data.status||'unknown');
-      status.className = 'error';
-    }
-  } catch (err) {
-    console.error(err);
-    status.textContent = 'Booking failed — network error.';
-    status.className = 'error';
-  }
-});
+  await fetch(api, {
+    method: "POST",
+    body: JSON.stringify({ date, room, slot, name })
+  });
 
-// initial load
+  status.innerHTML = "Booking successful!";
+  status.className = "success";
+
+  loadBookings();
+}
+
 loadBookings();
-
-// optional: refresh bookings every 10s so public page updates
-setInterval(loadBookings, 10000);
 </script>
-
 </body>
 </html>
