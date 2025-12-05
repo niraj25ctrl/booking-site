@@ -1,278 +1,284 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Booking System</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Room Booking — A/B/C/D</title>
   <style>
-    body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: linear-gradient(to bottom right, #eef2f3, #dfe9f3);
-      margin: 0;
-      padding: 0;
-      color: #333;
+    :root{
+      --accent:#0b74de;
+      --card:#ffffff;
+      --bg:linear-gradient(135deg,#eef2f3,#dfe9f3);
+      --muted:#6b7280;
+      --success:#16a34a;
+      --danger:#dc2626;
     }
-
-    header {
-      background: #0077ff;
-      color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 26px;
-      font-weight: bold;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 30px auto;
-      background: white;
-      padding: 25px;
-      border-radius: 14px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    h2 {
-      text-align: center;
-      color: #0077ff;
-      margin-bottom: 20px;
-    }
-
-    .form-box {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-bottom: 20px;
-    }
-
-    label {
-      font-weight: 600;
-      color: #444;
-    }
-
-    input,
-    select {
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #aaa;
-      width: 100%;
-      font-size: 15px;
-      background: #f9fcff;
-      transition: 0.2s;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: #0077ff;
-      box-shadow: 0 0 6px rgba(0, 119, 255, 0.3);
-      outline: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      background: #0077ff;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 17px;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background: #005fcc;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 25px;
-    }
-
-    th,
-    td {
-      border: 1px solid #ccc;
-      padding: 12px;
-      text-align: center;
-      font-size: 15px;
-    }
-
-    th {
-      background: #0077ff;
-      color: white;
-    }
-
-    tr:nth-child(even) {
-      background: #f2f7ff;
-    }
-
-    .loading {
-      text-align: center;
-      font-size: 20px;
-      color: #0077ff;
-      padding: 20px;
-    }
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;background:var(--bg);color:#0f172a}
+    header{background:var(--accent);color:#fff;padding:20px;text-align:center;font-weight:700;font-size:20px}
+    .wrap{max-width:980px;margin:28px auto;padding:22px;background:var(--card);border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.06)}
+    h1{color:var(--accent);margin:0 0 14px;font-size:22px;text-align:center}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    label{display:block;font-weight:600;color:#0f172a;margin-bottom:6px}
+    input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;background:#fbfeff;font-size:15px}
+    input:focus,select:focus{outline:none;box-shadow:0 0 0 4px rgba(11,116,222,0.08);border-color:var(--accent)}
+    .full{grid-column:1/ -1}
+    button{width:100%;padding:12px;border-radius:10px;background:var(--accent);color:#fff;border:0;font-weight:700;cursor:pointer}
+    button:hover{filter:brightness(.95)}
+    .small{font-size:13px;color:var(--muted);margin-top:8px}
+    table{width:100%;border-collapse:collapse;margin-top:20px}
+    th{background:var(--accent);color:#fff;padding:10px;text-align:left}
+    td{padding:10px;border-bottom:1px solid #eef2f6}
+    .tag{display:inline-block;padding:6px 8px;border-radius:8px;font-weight:700;color:#fff}
+    .tag.A{background:#0ea5a4} .tag.B{background:#7c3aed} .tag.C{background:#ef4444} .tag.D{background:#f97316} .tag.A-B{background:#0369a1}
+    .status{font-weight:700;margin-top:12px}
+    .success{color:var(--success)} .error{color:var(--danger)}
+    @media (max-width:720px){ .grid{grid-template-columns:1fr} }
   </style>
 </head>
-
 <body>
-  <header>Simple Public Booking System</header>
+  <header>Public Room Booking</header>
 
-  <div class="container">
-    <h2>Book Your Slot</h2>
+  <div class="wrap">
+    <h1>Book a Meeting Room</h1>
 
-    <!-- FORM -->
-    <div class="form-box">
+    <div class="grid">
       <div>
-        <label>Select Date</label>
-        <input type="date" id="dateInput" required />
+        <label for="date">Date</label>
+        <input id="date" type="date" />
       </div>
 
       <div>
-        <label>Your Name</label>
-        <input type="text" id="nameInput" placeholder="Enter your name" required />
+        <label for="room">Room</label>
+        <select id="room">
+          <option value="A">Room A</option>
+          <option value="B">Room B</option>
+          <option value="C">Room C</option>
+          <option value="D">Room D</option>
+          <option value="A+B">Rooms A & B (Combined)</option>
+        </select>
       </div>
 
       <div>
-        <label>Start Time</label>
-        <select id="startTime"></select>
+        <label for="start">Start Time</label>
+        <select id="start"></select>
       </div>
 
       <div>
-        <label>End Time</label>
-        <select id="endTime"></select>
+        <label for="end">End Time</label>
+        <select id="end"></select>
+      </div>
+
+      <div class="full">
+        <label for="name">Your name</label>
+        <input id="name" type="text" placeholder="Enter your name (required)" />
+      </div>
+
+      <div class="full">
+        <button id="bookBtn">Confirm Booking</button>
+        <div id="status" class="status small"></div>
       </div>
     </div>
 
-    <button onclick="bookSlot()">Book Now</button>
-
-    <h2>Booked Slots</h2>
-    <div id="loading" class="loading">Loading bookings...</div>
-
-    <table id="bookingTable" style="display: none">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Start</th>
-          <th>End</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
+    <h2 style="margin-top:22px;color:#0f172a">All Bookings</h2>
+    <div id="loading" class="small">Loading bookings…</div>
+    <table id="bookingsTable" style="display:none">
+      <thead><tr><th>Date</th><th>Time</th><th>Room</th><th>Booked By</th></tr></thead>
+      <tbody id="bookBody"></tbody>
     </table>
   </div>
 
-  <script>
-    const SCRIPT_URL =
-      "https://script.google.com/macros/s/AKfycbxzidQsMYaLgUudUz9jX-TpQDZJDrfizhK04N7YjDkgM7r5AsImsZQTTD8aLFlufkw-SA/exec";
+<script>
+const API = "https://script.google.com/macros/s/AKfycbxzidQsMYaLgUudUz9jX-TpQDZJDrfizhK04N7YjDkgM7r5AsImsZQTTD8aLFlufkw-SA/exec";
 
-    document.addEventListener("DOMContentLoaded", () => {
-      setMinDate();
-      generateTimeSlots();
-      loadBookings();
+const startSel = document.getElementById('start');
+const endSel = document.getElementById('end');
+const dateInput = document.getElementById('date');
+const roomSel = document.getElementById('room');
+const nameInput = document.getElementById('name');
+const bookBtn = document.getElementById('bookBtn');
+const statusDiv = document.getElementById('status');
+const loadingDiv = document.getElementById('loading');
+const bookingsTable = document.getElementById('bookingsTable');
+const bookBody = document.getElementById('bookBody');
+
+let bookings = []; // fetched bookings
+const todayISO = new Date().toISOString().split('T')[0];
+dateInput.min = todayISO;
+
+// generate time options 08:00 -> 22:00 with 30-min step
+function generateTimes() {
+  const times = [];
+  const start = 8*60; // 08:00
+  const end = 22*60; // 22:00
+  for (let t = start; t <= end; t += 30) {
+    const hh = String(Math.floor(t/60)).padStart(2,'0');
+    const mm = String(t%60).padStart(2,'0');
+    times.push(`${hh}:${mm}`);
+  }
+  return times;
+}
+
+const timesArr = generateTimes();
+function populateTimeSelects(){
+  startSel.innerHTML = '';
+  endSel.innerHTML = '';
+  // start options: all except last (so end can be after)
+  for (let i=0;i<timesArr.length-1;i++){
+    const opt = document.createElement('option'); opt.value = timesArr[i]; opt.textContent = timesArr[i];
+    startSel.appendChild(opt);
+  }
+  // end options initially all after first start
+  for (let i=1;i<timesArr.length;i++){
+    const opt = document.createElement('option'); opt.value = timesArr[i]; opt.textContent = timesArr[i];
+    endSel.appendChild(opt);
+  }
+}
+populateTimeSelects();
+
+startSel.addEventListener('change', () => {
+  const s = startSel.value;
+  // rebuild end options that are strictly greater than start
+  endSel.innerHTML = '';
+  for (let t of timesArr) {
+    if (timeToMin(t) > timeToMin(s)) {
+      const opt = document.createElement('option'); opt.value = t; opt.textContent = t;
+      endSel.appendChild(opt);
+    }
+  }
+});
+
+// utility: "HH:MM" -> minutes
+function timeToMin(t){
+  const [h,m] = t.split(':').map(Number); return h*60 + m;
+}
+
+// Fetch bookings from backend
+async function fetchBookings(){
+  try {
+    const res = await fetch(API);
+    const data = await res.json();
+    bookings = data || [];
+    renderBookings();
+    loadingDiv.style.display = 'none';
+    bookingsTable.style.display = bookings.length ? 'table' : 'none';
+  } catch (err) {
+    loadingDiv.textContent = 'Failed to load bookings';
+    console.error(err);
+  }
+}
+
+// Render table
+function renderBookings(){
+  bookBody.innerHTML = '';
+  // sort by date then start
+  bookings.sort((a,b) => {
+    if (a.date < b.date) return -1;
+    if (a.date > b.date) return 1;
+    if (a.start < b.start) return -1;
+    if (a.start > b.start) return 1;
+    return 0;
+  });
+  for (const r of bookings){
+    const tr = document.createElement('tr');
+    const roomLabel = getRoomTag(r.room);
+    tr.innerHTML = `<td>${r.date}</td>
+      <td>${r.start} → ${r.end}</td>
+      <td>${roomLabel}</td>
+      <td>${escapeHtml(r.name)}</td>`;
+    bookBody.appendChild(tr);
+  }
+}
+
+// room label with color tag
+function getRoomTag(roomVal){
+  if (!roomVal) return '';
+  if (roomVal === 'A+B') return `<span class="tag A-B">A & B</span>`;
+  const cls = roomVal.replace(/\s+/g,''); // e.g. "A"
+  return `<span class="tag ${cls}">${roomVal}</span>`;
+}
+
+// escape HTML
+function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+
+// Determine if requested booking conflicts with existing bookings
+// body: {date, start, end, room}
+function clientConflictCheck(body){
+  const roomsToBook = roomsFromValue(body.room); // e.g. ['A','B']
+  const s = timeToMin(body.start);
+  const e = timeToMin(body.end);
+
+  for (const b of bookings){
+    if (String(b.date) !== String(body.date)) continue;
+    const existingRooms = roomsFromValue(b.room);
+    // if no common rooms, skip
+    const intersect = existingRooms.filter(x=>roomsToBook.includes(x));
+    if (intersect.length === 0) continue;
+    const rs = timeToMin(b.start);
+    const re = timeToMin(b.end);
+    if (s < re && rs < e) {
+      return { conflict: true, rooms: intersect, existing: b };
+    }
+  }
+  return { conflict: false };
+}
+
+function roomsFromValue(roomVal){
+  if (!roomVal) return [];
+  if (roomVal === 'A+B' || roomVal === 'A + B' || roomVal === 'A & B') return ['A','B'];
+  return [roomVal];
+}
+
+// On submit
+bookBtn.addEventListener('click', async () => {
+  clearStatus();
+  const date = dateInput.value;
+  const start = startSel.value;
+  const end = endSel.value;
+  const room = roomSel.value;
+  const name = nameInput.value.trim();
+
+  if (!date || !start || !end || !name || !room) {
+    showError('Please fill all fields.');
+    return;
+  }
+  // client-side check: start < end already enforced by selects
+  // check conflict
+  const check = clientConflictCheck({date,start,end,room});
+  if (check.conflict) {
+    showError(`Conflict: overlaps existing booking for room(s): ${check.rooms.join(', ')} (${check.existing.start}–${check.existing.end})`);
+    return;
+  }
+
+  // send to server
+  try {
+    const resp = await fetch(API, {
+      method: 'POST',
+      body: JSON.stringify({ date, name, start, end, room })
     });
-
-    function setMinDate() {
-      const today = new Date().toISOString().split("T")[0];
-      document.getElementById("dateInput").setAttribute("min", today);
+    const data = await resp.json();
+    if (data.status === 'success') {
+      showSuccess('Booked successfully!');
+      // refresh bookings
+      await fetchBookings();
+    } else if (data.status === 'conflict') {
+      showError('Server conflict: ' + (data.message || 'Overlapping booking'));
+      // refresh to show true state
+      await fetchBookings();
+    } else {
+      showError('Error: ' + (data.message || 'Unknown error'));
     }
+  } catch (err) {
+    console.error(err);
+    showError('Network or server error. Check console.');
+  }
+});
 
-    function generateTimeSlots() {
-      const start = document.getElementById("startTime");
-      const end = document.getElementById("endTime");
+function showSuccess(msg){ statusDiv.className='status success'; statusDiv.textContent = msg; setTimeout(()=>{ statusDiv.textContent=''; }, 4000); }
+function showError(msg){ statusDiv.className='status error'; statusDiv.textContent = msg; setTimeout(()=>{ statusDiv.textContent=''; }, 6000); }
+function clearStatus(){ statusDiv.textContent=''; statusDiv.className='status small'; }
 
-      let timeList = generateTimeArray("08:00", "22:00", 30);
-
-      timeList.forEach(t => {
-        start.innerHTML += `<option value="${t}">${t}</option>`;
-        end.innerHTML += `<option value="${t}">${t}</option>`;
-      });
-
-      start.addEventListener("change", () => {
-        let s = start.value;
-        end.innerHTML = "";
-
-        timeList.forEach(t => {
-          if (t > s) {
-            end.innerHTML += `<option value="${t}">${t}</option>`;
-          }
-        });
-      });
-    }
-
-    function generateTimeArray(start, end, interval) {
-      let times = [];
-      let [sh, sm] = start.split(":").map(Number);
-      let [eh, em] = end.split(":").map(Number);
-
-      let date = new Date();
-      date.setHours(sh, sm);
-
-      while (date.getHours() < eh || (date.getHours() === eh && date.getMinutes() <= em)) {
-        let h = date.getHours().toString().padStart(2, "0");
-        let m = date.getMinutes().toString().padStart(2, "0");
-        times.push(`${h}:${m}`);
-        date.setMinutes(date.getMinutes() + interval);
-      }
-      return times;
-    }
-
-    function loadBookings() {
-      fetch(SCRIPT_URL + "?action=get")
-        .then((res) => res.json())
-        .then((data) => {
-          document.getElementById("loading").style.display = "none";
-          const table = document.getElementById("bookingTable");
-          const body = document.getElementById("tableBody");
-
-          body.innerHTML = "";
-
-          data.forEach((row) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${row.date}</td>
-              <td>${row.name}</td>
-              <td>${row.start}</td>
-              <td>${row.end}</td>
-            `;
-            body.appendChild(tr);
-          });
-
-          table.style.display = "table";
-        })
-        .catch(() => {
-          document.getElementById("loading").innerText =
-            "Failed loading data!";
-        });
-    }
-
-    function bookSlot() {
-      const date = document.getElementById("dateInput").value;
-      const name = document.getElementById("nameInput").value.trim();
-      const start = document.getElementById("startTime").value;
-      const end = document.getElementById("endTime").value;
-
-      if (!date || !name || !start || !end) {
-        alert("Please fill all fields!");
-        return;
-      }
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ date, name, start, end }),
-      })
-        .then((res) => res.text())
-        .then((msg) => {
-          alert(msg);
-          loadBookings();
-        })
-        .catch(() => alert("Error booking slot!"));
-    }
-  </script>
-
+// initial load
+fetchBookings();
+</script>
 </body>
-
 </html>
