@@ -1,247 +1,278 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Booking System</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking System</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(to bottom right, #eef2f3, #dfe9f3);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
 
-<style>
-  body {
-    background:#eef2f3;
-    font-family:Arial;
-    margin:0;
-    padding:20px;
-  }
+    header {
+      background: #0077ff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: bold;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
 
-  .container {
-    max-width:900px;
-    margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:14px;
-    box-shadow:0 5px 20px rgba(0,0,0,0.1);
-  }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
 
-  h2 {
-    text-align:center;
-    color:#2c3e50;
-    margin-bottom:15px;
-  }
+    h2 {
+      text-align: center;
+      color: #0077ff;
+      margin-bottom: 20px;
+    }
 
-  .field {
-    margin-top:12px;
-  }
+    .form-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
 
-  label {
-    font-weight:bold;
-    display:block;
-    margin-bottom:4px;
-  }
+    label {
+      font-weight: 600;
+      color: #444;
+    }
 
-  input, select {
-    width:100%;
-    padding:10px;
-    border-radius:6px;
-    border:1px solid #ccc;
-    font-size:16px;
-  }
+    input,
+    select {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #aaa;
+      width: 100%;
+      font-size: 15px;
+      background: #f9fcff;
+      transition: 0.2s;
+    }
 
-  button {
-    width:100%;
-    padding:12px;
-    margin-top:20px;
-    background:#3498db;
-    color:white;
-    border:none;
-    border-radius:8px;
-    font-size:18px;
-    cursor:pointer;
-  }
-  button:hover { background:#2980b9; }
+    input:focus,
+    select:focus {
+      border-color: #0077ff;
+      box-shadow: 0 0 6px rgba(0, 119, 255, 0.3);
+      outline: none;
+    }
 
-  #status {
-    margin-top:15px;
-    font-size:17px;
-    font-weight:bold;
-  }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #0077ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 17px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.2s;
+    }
 
-  table {
-    width:100%;
-    border-collapse:collapse;
-    margin-top:22px;
-  }
+    button:hover {
+      background: #005fcc;
+    }
 
-  th {
-    background:#3498db;
-    color:white;
-    padding:10px;
-  }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+    }
 
-  td {
-    padding:10px;
-    border:1px solid #ddd;
-  }
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: center;
+      font-size: 15px;
+    }
 
-  .available {
-    background:#e8ffe8;
-    color:green;
-    font-weight:bold;
-  }
+    th {
+      background: #0077ff;
+      color: white;
+    }
 
-  .booked {
-    background:#ffe2e2;
-    color:#d00000;
-    font-weight:bold;
-  }
-</style>
+    tr:nth-child(even) {
+      background: #f2f7ff;
+    }
+
+    .loading {
+      text-align: center;
+      font-size: 20px;
+      color: #0077ff;
+      padding: 20px;
+    }
+  </style>
 </head>
 
 <body>
-<div class="container">
+  <header>Simple Public Booking System</header>
 
-<h2>Open Booking System</h2>
+  <div class="container">
+    <h2>Book Your Slot</h2>
 
-<div class="field">
-  <label>Select Date</label>
-  <input type="date" id="date">
-</div>
+    <!-- FORM -->
+    <div class="form-box">
+      <div>
+        <label>Select Date</label>
+        <input type="date" id="dateInput" required />
+      </div>
 
-<div class="field">
-  <label>Select Room</label>
-  <select id="room">
-    <option>101</option>
-    <option>102</option>
-    <option>103</option>
-  </select>
-</div>
+      <div>
+        <label>Your Name</label>
+        <input type="text" id="nameInput" placeholder="Enter your name" required />
+      </div>
 
-<div class="field">
-  <label>Select Slot</label>
-  <select id="slot">
-    <option>10:00–11:00</option>
-    <option>11:00–12:00</option>
-    <option>12:00–13:00</option>
-    <option>13:00–14:00</option>
-    <option>14:00–15:00</option>
-  </select>
-</div>
+      <div>
+        <label>Start Time</label>
+        <select id="startTime"></select>
+      </div>
 
-<div class="field">
-  <label>Your Name</label>
-  <input type="text" id="name">
-</div>
+      <div>
+        <label>End Time</label>
+        <select id="endTime"></select>
+      </div>
+    </div>
 
-<button onclick="book()">Book Slot</button>
+    <button onclick="bookSlot()">Book Now</button>
 
-<div id="status"></div>
+    <h2>Booked Slots</h2>
+    <div id="loading" class="loading">Loading bookings...</div>
 
-<h3>Bookings</h3>
-<div id="tableDiv">Loading...</div>
+    <table id="bookingTable" style="display: none">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Start</th>
+          <th>End</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
 
-</div>
+  <script>
+    const SCRIPT_URL =
+      "https://script.google.com/macros/s/AKfycbxzidQsMYaLgUudUz9jX-TpQDZJDrfizhK04N7YjDkgM7r5AsImsZQTTD8aLFlufkw-SA/exec";
 
-<script>
-const api = "https://script.google.com/macros/s/AKfycbxzidQsMYaLgUudUz9jX-TpQDZJDrfizhK04N7YjDkgM7r5AsImsZQTTD8aLFlufkw-SA/exec";  // <-- paste your /exec URL here
+    document.addEventListener("DOMContentLoaded", () => {
+      setMinDate();
+      generateTimeSlots();
+      loadBookings();
+    });
 
-let allBookings = [];
-const today = new Date().toISOString().split("T")[0];
-document.getElementById("date").min = today;
-
-// Reload booked slots when user changes date/room
-document.getElementById("date").addEventListener("change", updateSlotState);
-document.getElementById("room").addEventListener("change", updateSlotState);
-
-// Fetch all bookings
-async function loadBookings() {
-  const res = await fetch(api);
-  allBookings = await res.json();
-
-  renderTable();
-  updateSlotState();
-}
-
-// Show bookings table
-function renderTable() {
-  if (!allBookings.length) {
-    document.getElementById("tableDiv").innerHTML = "No bookings yet.";
-    return;
-  }
-
-  let html = `<table>
-    <tr><th>Date</th><th>Room</th><th>Slot</th><th>Name</th></tr>`;
-
-  allBookings.forEach(b => {
-    html += `<tr>
-      <td>${b.Date}</td>
-      <td>${b.Room}</td>
-      <td>${b.Slot}</td>
-      <td>${b.Name}</td>
-    </tr>`;
-  });
-
-  html += `</table>`;
-  document.getElementById("tableDiv").innerHTML = html;
-}
-
-// Disable booked slots
-function updateSlotState() {
-  const d = document.getElementById("date").value;
-  const r = document.getElementById("room").value;
-  const slotSel = document.getElementById("slot");
-
-  const booked = new Set(
-    allBookings
-      .filter(b => b.Date === d && b.Room === r)
-      .map(b => b.Slot)
-  );
-
-  for (let opt of slotSel.options) {
-    if (booked.has(opt.value)) {
-      opt.disabled = true;
-      opt.textContent = opt.value + " (Booked)";
-    } else {
-      opt.disabled = false;
-      opt.textContent = opt.value;
+    function setMinDate() {
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("dateInput").setAttribute("min", today);
     }
-  }
-}
 
-// Book a slot
-async function book() {
-  const date = document.getElementById("date").value;
-  const room = document.getElementById("room").value;
-  const slot = document.getElementById("slot").value;
-  const name = document.getElementById("name").value.trim();
+    function generateTimeSlots() {
+      const start = document.getElementById("startTime");
+      const end = document.getElementById("endTime");
 
-  if (!date || !name) {
-    showStatus("Fill all fields!", "red");
-    return;
-  }
+      let timeList = generateTimeArray("08:00", "22:00", 30);
 
-  const r = await fetch(api, {
-    method: "POST",
-    body: JSON.stringify({ date, room, slot, name })
-  });
+      timeList.forEach(t => {
+        start.innerHTML += `<option value="${t}">${t}</option>`;
+        end.innerHTML += `<option value="${t}">${t}</option>`;
+      });
 
-  const result = await r.json();
+      start.addEventListener("change", () => {
+        let s = start.value;
+        end.innerHTML = "";
 
-  if (result.status === "already_booked") {
-    showStatus("This slot is already booked!", "red");
-  } else {
-    showStatus("Booking successful!", "green");
-    loadBookings();
-  }
-}
+        timeList.forEach(t => {
+          if (t > s) {
+            end.innerHTML += `<option value="${t}">${t}</option>`;
+          }
+        });
+      });
+    }
 
-// Show message
-function showStatus(msg, color) {
-  const s = document.getElementById("status");
-  s.style.color = color;
-  s.textContent = msg;
-}
+    function generateTimeArray(start, end, interval) {
+      let times = [];
+      let [sh, sm] = start.split(":").map(Number);
+      let [eh, em] = end.split(":").map(Number);
 
-loadBookings();
-</script>
+      let date = new Date();
+      date.setHours(sh, sm);
+
+      while (date.getHours() < eh || (date.getHours() === eh && date.getMinutes() <= em)) {
+        let h = date.getHours().toString().padStart(2, "0");
+        let m = date.getMinutes().toString().padStart(2, "0");
+        times.push(`${h}:${m}`);
+        date.setMinutes(date.getMinutes() + interval);
+      }
+      return times;
+    }
+
+    function loadBookings() {
+      fetch(SCRIPT_URL + "?action=get")
+        .then((res) => res.json())
+        .then((data) => {
+          document.getElementById("loading").style.display = "none";
+          const table = document.getElementById("bookingTable");
+          const body = document.getElementById("tableBody");
+
+          body.innerHTML = "";
+
+          data.forEach((row) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${row.date}</td>
+              <td>${row.name}</td>
+              <td>${row.start}</td>
+              <td>${row.end}</td>
+            `;
+            body.appendChild(tr);
+          });
+
+          table.style.display = "table";
+        })
+        .catch(() => {
+          document.getElementById("loading").innerText =
+            "Failed loading data!";
+        });
+    }
+
+    function bookSlot() {
+      const date = document.getElementById("dateInput").value;
+      const name = document.getElementById("nameInput").value.trim();
+      const start = document.getElementById("startTime").value;
+      const end = document.getElementById("endTime").value;
+
+      if (!date || !name || !start || !end) {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ date, name, start, end }),
+      })
+        .then((res) => res.text())
+        .then((msg) => {
+          alert(msg);
+          loadBookings();
+        })
+        .catch(() => alert("Error booking slot!"));
+    }
+  </script>
 
 </body>
+
 </html>
